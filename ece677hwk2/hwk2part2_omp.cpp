@@ -20,13 +20,16 @@ void populate_matrix(unsigned char matrix[MATSIZEX][MATSIZEY])
     std::mt19937 gen(rd());//mesenne twister engine
     std::uniform_int_distribution<unsigned char> dis(RANGE_LOW, RANGE_HIGH);
 	
-
+	#pragma omp parallel
+	{
+	#pragma omp for
     for (int ii=0; ii<MATSIZEX; ++ii)
 	{
 		for(int jj=0; jj< MATSIZEY; ++jj)
 		{
 			matrix[ii][jj] = dis(gen);
 		}
+	}
 	}
 }
 
@@ -60,8 +63,6 @@ int filter_window(unsigned char matrix[MATSIZEX][MATSIZEY], size_t x, size_t y)
 {
 	double sum=0;
 
-	#pragma omp parallel
-	#pragma omp for
 	for(int ii=x; ii<x+WINDOWX; ii++)
 	{
 		for(int jj=y; jj<y+WINDOWY; jj++)
@@ -86,6 +87,7 @@ int main()
 	memcpy(final_matrix, start_matrix, MATSIZEX*MATSIZEY*sizeof(unsigned char) );
 	int filter_val;
 	print_matrix(start_matrix, 8,8);
+	#pragma omp parallel for
 	for (int ii=0; ii<MATSIZEX-1; ++ii)
 	{
 		for(int jj=0; jj< MATSIZEY-1; ++jj)
@@ -99,8 +101,8 @@ int main()
 				}
 			}
 		
-			printf("_________________________________________________\n");
-			print_matrix(final_matrix, 8, 8);
+			//printf("_________________________________________________\n");
+			//print_matrix(final_matrix, 8, 8);
 			exit(0);
 			
 		}
