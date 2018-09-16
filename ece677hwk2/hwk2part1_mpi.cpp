@@ -1,6 +1,5 @@
 #include <iostream>
 #include <random>
-#include <omp.h>
 
 #define MATSIZEX 128
 #define MATSIZEY 128
@@ -13,8 +12,7 @@ void populate_matrix(unsigned char matrix[MATSIZEX][MATSIZEY])
     std::mt19937 gen(rd());//mesenne twister engine
     std::uniform_int_distribution<unsigned char> dis(RANGE_LOW, RANGE_HIGH);
 	
-	#pragma omp parallel
-	#pragma omp for
+
     for (int ii=0; ii<MATSIZEX; ++ii)
 	{
 		for(int jj=0; jj< MATSIZEY; ++jj)
@@ -28,10 +26,6 @@ void populate_matrix(unsigned char matrix[MATSIZEX][MATSIZEY])
 
 void inline count( unsigned char matrix[MATSIZEX][MATSIZEY], size_t count_vals[] )
 {
-
-	#pragma omp parallel
-	{
-	#pragma omp for
 	for(int kk=RANGE_LOW; kk<RANGE_HIGH+1; kk++)
 	{
 		count_vals[kk]=0;
@@ -44,7 +38,6 @@ void inline count( unsigned char matrix[MATSIZEX][MATSIZEY], size_t count_vals[]
 			}
 		}
 
-	}
 	}
 }
 
@@ -71,13 +64,14 @@ int main()
 	populate_matrix(matrix);
 	count(matrix, count_vals);
 	int sum=0;
-
-	for(size_t index=0; index<RANGE_HIGH+1; index++)
+	for(size_t index; index<RANGE_HIGH+1; index++)
 	{
-		std::cout << index<< ": " << count_vals[index] << " " << std::endl;
+		//std::cout << index<< ": " << count_vals[index] << " " << std::endl;
 		sum=sum+count_vals[index];
 	}
-	std::cout << "checksum: SUM IS " << sum << " But should be "<< 128*128<<std::endl;
+	//std::cout << "SUM IS " << sum << " But should be "<< 128*128<<std::endl;
+
+	
 }
 
 
