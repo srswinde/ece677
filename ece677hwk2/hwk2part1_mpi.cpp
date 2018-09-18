@@ -57,6 +57,9 @@ void inline count_onenum( unsigned char matrix[MATSIZEX][MATSIZEY], size_t count
 
 }
 
+/***********************************************************
+ * Count values in partitions of the matrix
+*********************************************************/
 void inline count_chunk( unsigned char matrix[MATSIZEX][MATSIZEY], int count_vals[], size_t startx, size_t starty, size_t chunksizex, size_t chunksizey)
 {
 	assert((startx+chunksizex) <= MATSIZEX );
@@ -127,7 +130,7 @@ int main()
 
 	
 
-
+	//Break the matrix into partitions based on the rank of the thread. 
 	count_chunk(matrix, local_count_vals, (rank)*MATSIZEX/size, 0, MATSIZEX/size, MATSIZEY );
 	/*printf("rank: %d, chunkx: %d-%d, chunky: %d-%d\n", 
 			rank, 
@@ -138,8 +141,8 @@ int main()
 	*/
 	if (rank == 0)
 	{
-		print_matrix(matrix, (rank)*MATSIZEX/(size), 0, MATSIZEX/(size), MATSIZEY );
-		print_count(local_count_vals);
+		//print_matrix(matrix, (rank)*MATSIZEX/(size), 0, MATSIZEX/(size), MATSIZEY );
+		//print_count(local_count_vals);
 	}
 	MPI_Reduce(local_count_vals, global_count_vals, RANGE_HIGH+1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 	int sum=0;
@@ -155,7 +158,7 @@ int main()
 		}
 		std::cout << std::endl << "SUM IS " << sum << " But should be "<< MATSIZEX*MATSIZEY<<std::endl;
 		*/
-		print_count(global_count_vals);
+		//print_count(global_count_vals);
 	}
 
 	
