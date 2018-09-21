@@ -20,9 +20,9 @@ void populate_matrix(unsigned char matrix[MATSIZEX][MATSIZEY])
     std::mt19937 gen(rd());//mesenne twister engine
     std::uniform_int_distribution<unsigned char> dis(RANGE_LOW, RANGE_HIGH);
 	
-	#pragma omp parallel
-	{
-	#pragma omp for
+	//#pragma omp parallel
+	//{
+	//#pragma omp for
     for (int ii=0; ii<MATSIZEX; ++ii)
 	{
 		for(int jj=0; jj< MATSIZEY; ++jj)
@@ -30,7 +30,7 @@ void populate_matrix(unsigned char matrix[MATSIZEX][MATSIZEY])
 			matrix[ii][jj] = dis(gen);
 		}
 	}
-	}
+	//}
 }
 
 

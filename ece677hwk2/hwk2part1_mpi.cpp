@@ -7,6 +7,7 @@
 #define MATSIZEY 128
 #define RANGE_HIGH 31
 #define RANGE_LOW 0
+#include <sys/time.h>
 
 void populate_matrix(unsigned char matrix[MATSIZEX][MATSIZEY])
 {
@@ -25,6 +26,15 @@ void populate_matrix(unsigned char matrix[MATSIZEX][MATSIZEY])
 }
 
 
+/**
+ * Returns the current time in microseconds.
+ */
+long getMicrotime()
+{
+	struct timeval currentTime;
+	gettimeofday(&currentTime, NULL);
+	return currentTime.tv_sec * (int)1e6 + currentTime.tv_usec;
+}
 
 void inline count( unsigned char matrix[MATSIZEX][MATSIZEY], size_t count_vals[] )
 {
@@ -115,23 +125,32 @@ int main()
 	int global_count_vals[RANGE_HIGH+1];
 	int fudge_factor=0;
 	int startx, starty, width, height, sides;
-
+	long long timer;
+	long long timers[4];
 	for(int ii=0; ii<=RANGE_HIGH; ii++)
 	{
 		local_count_vals[ii]=0;
 		global_count_vals[ii]=0;
 	}
 
-	populate_matrix(matrix);
+	
 
+	if(rank==0)
+		timer = getMicrotime();
 	MPI_Init(NULL, NULL);
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	timers[rank]=getMicrotime();
+	if(rank == 0)
+	{
+		populate_matrix(matrix);
+	}
 
-	
-
+	if (rank == 0)
+		printf("pop is %f\n", (getMicrotime()-timer)/1e6 );
 	//Break the matrix into partitions based on the rank of the thread. 
 	count_chunk(matrix, local_count_vals, (rank)*MATSIZEX/size, 0, MATSIZEX/size, MATSIZEY );
+	
 	/*printf("rank: %d, chunkx: %d-%d, chunky: %d-%d\n", 
 			rank, 
 			(rank)*MATSIZEX/size, 
@@ -145,23 +164,24 @@ int main()
 		//print_count(local_count_vals);
 	}
 	MPI_Reduce(local_count_vals, global_count_vals, RANGE_HIGH+1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-	int sum=0;
+		int sum=0;
 
 	if(rank == 0)
 	{
 		//print_matrix(matrix, 0,0,MATSIZEX, MATSIZEY);
-		/*
+		
 		for(size_t index=0; index<RANGE_HIGH+1; index++)
 		{
-			std::cout << index<< ": " << global_count_vals[index] << " ";
+			//std::cout << index<< ": " << global_count_vals[index] << " ";
 			sum=sum+global_count_vals[index];
 		}
-		std::cout << std::endl << "SUM IS " << sum << " But should be "<< MATSIZEX*MATSIZEY<<std::endl;
-		*/
+		//std::cout << std::endl << "SUM IS " << sum << " But should be "<< MATSIZEX*MATSIZEY<<std::endl;
+		
 		//print_count(global_count_vals);
 	}
 
-	
+	timers[rank] = getMicrotime()-timers[rank];
+	printf("%i %f\n", rank, (timers[rank])/1e6);
 	MPI_Finalize();
 }
 

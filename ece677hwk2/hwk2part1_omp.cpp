@@ -13,6 +13,7 @@ void populate_matrix(unsigned char matrix[MATSIZEX][MATSIZEY])
     std::mt19937 gen(rd());//mesenne twister engine
     std::uniform_int_distribution<unsigned char> dis(RANGE_LOW, RANGE_HIGH);
 	
+	omp_set_num_threads(2);
 	#pragma omp parallel
 	#pragma omp for
     for (int ii=0; ii<MATSIZEX; ++ii)
@@ -28,7 +29,7 @@ void populate_matrix(unsigned char matrix[MATSIZEX][MATSIZEY])
 
 void inline count( unsigned char matrix[MATSIZEX][MATSIZEY], size_t count_vals[] )
 {
-
+	omp_set_num_threads(2);
 	#pragma omp parallel
 	{
 	#pragma omp for
@@ -77,7 +78,7 @@ int main()
 		std::cout << index<< ": " << count_vals[index] << " " << std::endl;
 		sum=sum+count_vals[index];
 	}
-	std::cout << "checksum: SUM IS " << sum << " But should be "<< 128*128<<std::endl;
+	std::cout << "checksum: SUM IS " << sum << " But should be "<< MATSIZEX*MATSIZEY<<std::endl;
 }
 
 
