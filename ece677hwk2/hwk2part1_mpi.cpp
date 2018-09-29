@@ -138,16 +138,17 @@ int main()
 	if(rank==0)
 		timer = getMicrotime();
 	MPI_Init(NULL, NULL);
+	
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	if (rank == 0)
+		printf("pop is %f\n", (getMicrotime()-timer)/1e6 );
 	timers[rank]=getMicrotime();
 	if(rank == 0)
 	{
 		populate_matrix(matrix);
 	}
 
-	if (rank == 0)
-		printf("pop is %f\n", (getMicrotime()-timer)/1e6 );
 	//Break the matrix into partitions based on the rank of the thread. 
 	count_chunk(matrix, local_count_vals, (rank)*MATSIZEX/size, 0, MATSIZEX/size, MATSIZEY );
 	

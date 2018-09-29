@@ -66,10 +66,10 @@ int main()
 	int sum=0;
 	for(size_t index; index<RANGE_HIGH+1; index++)
 	{
-		//std::cout << index<< ": " << count_vals[index] << " " << std::endl;
+		std::cout << index<< ": " << count_vals[index] << " " << std::endl;
 		sum=sum+count_vals[index];
 	}
-	//std::cout << "SUM IS " << sum << " But should be "<< 128*128<<std::endl;
+	std::cout << "SUM IS " << sum << " But should be "<< 128*128<<std::endl;
 
 	
 }
