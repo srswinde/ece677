@@ -117,6 +117,11 @@ void print_count(int count_vals[])
 	std::cout << std::endl << "SUM IS " << sum << " But should be "<< MATSIZEX*MATSIZEY<<std::endl;
 }
 
+void printtime(const char desc[10], int rank, int size, long long timer)
+{
+	printf("mpi> %s %i %i %f\n", desc, rank, size, (getMicrotime()-timer)/1e6);
+}
+
 int main(int argc, char * argv[])
 {
 	unsigned char matrix[MATSIZEX][MATSIZEY];
@@ -129,7 +134,8 @@ int main(int argc, char * argv[])
 	MPI_Init(&argc, &argv);
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	printf("init %i %i %f\n", rank, size, (getMicrotime()-timer)/1e6);
+	printtime("init", rank, size, timer);
+	//printf("mpi> init %i %i %f\n", rank, size, (getMicrotime()-timer)/1e6);
 
 	int local_count_vals[RANGE_HIGH+1];
 	int global_count_vals[RANGE_HIGH+1];
@@ -149,7 +155,7 @@ int main(int argc, char * argv[])
 	//Break the matrix into partitions based on the rank of the thread. 
 	count_chunk(matrix, local_count_vals, (rank)*MATSIZEX/size, 0, MATSIZEX/size, MATSIZEY );
 	
-	printf("calc %i %i %f\n", rank, size, (getMicrotime()-timer)/1e6);
+	printtime("calc", rank, size, timer);
 	/*printf("rank: %d, chunkx: %d-%d, chunky: %d-%d\n", 
 			rank, 
 			(rank)*MATSIZEX/size, 
@@ -160,7 +166,8 @@ int main(int argc, char * argv[])
 
 	timer=getMicrotime();//restart timer
 	MPI_Reduce(local_count_vals, global_count_vals, RANGE_HIGH+1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-	printf("comm %i %i %f\n", rank, size, (getMicrotime()-timer)/1e6);
+	printtime("comm", rank, size, timer);
+
 	int sum=0;
 
 	if(rank == 0)
@@ -181,7 +188,7 @@ int main(int argc, char * argv[])
 
 	timer=getMicrotime();//restart timer
 	MPI_Finalize();
-	printf("final %i %i %f\n", rank, size, (getMicrotime()-timer)/1e6);
+	printtime("final", rank, size, timer);
 }
 
 
