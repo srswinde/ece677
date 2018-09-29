@@ -1,6 +1,7 @@
 #include <iostream>
 #include <random>
 #include <memory.h>
+#include <mpi.h>
 
 #define MATSIZEX 256
 #define MATSIZEY 256
@@ -60,8 +61,6 @@ int filter_window(unsigned char matrix[MATSIZEX][MATSIZEY], size_t x, size_t y)
 {
 	double sum=0;
 
-	#pragma omp parallel
-	#pragma omp for
 	for(int ii=x; ii<x+WINDOWX; ii++)
 	{
 		for(int jj=y; jj<y+WINDOWY; jj++)
