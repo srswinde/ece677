@@ -117,16 +117,26 @@ void print_count(int count_vals[])
 	std::cout << std::endl << "SUM IS " << sum << " But should be "<< MATSIZEX*MATSIZEY<<std::endl;
 }
 
-int main()
+int main(int argc, char * argv[])
 {
 	unsigned char matrix[MATSIZEX][MATSIZEY];
+	populate_matrix(matrix);
 	int rank, size, ii, jj;
+	long long timer;
+	long long timers[4];
+
+	timer = getMicrotime();
+	MPI_Init(&argc, &argv);
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	printf("init %i %i %f\n", rank, size, (getMicrotime()-timer)/1e6);
+
 	int local_count_vals[RANGE_HIGH+1];
 	int global_count_vals[RANGE_HIGH+1];
 	int fudge_factor=0;
 	int startx, starty, width, height, sides;
-	long long timer;
-	long long timers[4];
+
+	timer=getMicrotime();//restart timer
 	for(int ii=0; ii<=RANGE_HIGH; ii++)
 	{
 		local_count_vals[ii]=0;
@@ -134,24 +144,12 @@ int main()
 	}
 
 	
-
-	if(rank==0)
-		timer = getMicrotime();
-	MPI_Init(NULL, NULL);
 	
-	MPI_Comm_size(MPI_COMM_WORLD, &size);
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0)
-		printf("pop is %f\n", (getMicrotime()-timer)/1e6 );
-	timers[rank]=getMicrotime();
-	if(rank == 0)
-	{
-		populate_matrix(matrix);
-	}
 
 	//Break the matrix into partitions based on the rank of the thread. 
 	count_chunk(matrix, local_count_vals, (rank)*MATSIZEX/size, 0, MATSIZEX/size, MATSIZEY );
 	
+	printf("calc %i %i %f\n", rank, size, (getMicrotime()-timer)/1e6);
 	/*printf("rank: %d, chunkx: %d-%d, chunky: %d-%d\n", 
 			rank, 
 			(rank)*MATSIZEX/size, 
@@ -159,13 +157,11 @@ int main()
 			(rank)*MATSIZEY/size, 
 			(rank)*MATSIZEY/size+MATSIZEX/size);
 	*/
-	if (rank == 0)
-	{
-		//print_matrix(matrix, (rank)*MATSIZEX/(size), 0, MATSIZEX/(size), MATSIZEY );
-		//print_count(local_count_vals);
-	}
+
+	timer=getMicrotime();//restart timer
 	MPI_Reduce(local_count_vals, global_count_vals, RANGE_HIGH+1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-		int sum=0;
+	printf("comm %i %i %f\n", rank, size, (getMicrotime()-timer)/1e6);
+	int sum=0;
 
 	if(rank == 0)
 	{
@@ -182,8 +178,10 @@ int main()
 	}
 
 	timers[rank] = getMicrotime()-timers[rank];
-	printf("%i %f\n", rank, (timers[rank])/1e6);
+
+	timer=getMicrotime();//restart timer
 	MPI_Finalize();
+	printf("final %i %i %f\n", rank, size, (getMicrotime()-timer)/1e6);
 }
 
 
