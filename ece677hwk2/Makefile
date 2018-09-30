@@ -1,7 +1,7 @@
 
 
 
-all: part1_serial part1_omp part1_mpi part2_serial part2_omp
+all: part1_serial part1_omp part1_mpi part2_serial part2_omp part2_mpi
 
 part1_serial: hwk2part1_serial.cpp
 	g++ hwk2part1_serial.cpp -o p1s
@@ -18,3 +18,6 @@ part2_serial: hwk2part2_serial.cpp
 
 part2_omp: hwk2part2_omp.cpp
 	g++ -fopenmp hwk2part2_omp.cpp -o p2o
+
+part2_mpi: hwk2part2_omp.cpp
+	 mpic++ hwk2part2_mpi.cpp -o p2mpi
