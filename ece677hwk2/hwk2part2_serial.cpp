@@ -1,7 +1,6 @@
 #include <iostream>
 #include <random>
 #include <memory.h>
-#include <mpi.h>
 
 #define MATSIZEX 256
 #define MATSIZEY 256
