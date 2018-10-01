@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
 
 
 	//number of 3by3 blocks in matrix
-	int nblocks = (int) MATSIZEX*MATSIZEY/9;
+	int nblocks = (int) MATSIZEX*MATSIZEY;
 
 	//number of bocks to be summed by each process
 	//Not including 0 b/c thread 0 does the cooordination
@@ -217,30 +217,32 @@ int main(int argc, char *argv[])
 
 
 	else
-	{//other threads filter
+	{//other threads work on the filter
 		timer=getMicrotime();
-		for(int proc_block=0; proc_block<blocks_per_proc; proc_block++)
+		while(starty < MATSIZEY)
 		{
 			sum=0;
 			if(startx > MATSIZEX)
-			{//advance the column by WINDOWY
+			{//advance the column by 1
 				startx = startx%MATSIZEX;
 				block_row++;
-				starty+=WINDOWY;
+				starty+=1;
 			}
 
-			//ignore thdde edges
+			//ignore the edges
 			if(startx+WINDOWX > MATSIZEX || starty+WINDOWY > MATSIZEY)
 			{
 				summsg[0] = THREAD_SKIP;
 				summsg[1] = startx;
 				summsg[2] = starty;
-				// we are at the edge so send skep message.
-				//
+				// we are at the edge so send skip message.
+				
 				MPI_Send(summsg, 3, MPI_INT, 0, 0, MPI_COMM_WORLD);
 			}
 			else
 			{
+				if(rank == 1)
+					printf("start y is %i\n", starty);
 				for(int ii=startx; ii<startx+WINDOWX; ii++)
 				{
 					for(int jj=starty; jj<starty+WINDOWY; jj++)
@@ -256,15 +258,14 @@ int main(int argc, char *argv[])
 				MPI_Send(summsg, 3, MPI_INT, 0, 0, MPI_COMM_WORLD);
 			
 			}
-			//set startx for the next block to manipulate. 	
-			startx += WINDOWX*(size-1);
+			//set startx for the next block to manipulate. 
+			startx += 1*(size-1);
 		}
 		summsg[0] = THREAD_FINISHED;
 		MPI_Send(summsg, 3, MPI_INT, 0, 0, MPI_COMM_WORLD);
 		printtime("filter", rank, size, timer );
 	}
 	MPI_Finalize();
-
 }
 
 
