@@ -25,7 +25,12 @@ void populate_matrix(unsigned char matrix[MATSIZEX][MATSIZEY])
 	}
 }
 
-
+long getMicrotime()
+{
+        struct timeval currentTime;
+        gettimeofday(&currentTime, NULL);
+        return currentTime.tv_sec * (int)1e6 + currentTime.tv_usec;
+}
 
 void inline count( unsigned char matrix[MATSIZEX][MATSIZEY], size_t count_vals[] )
 {
