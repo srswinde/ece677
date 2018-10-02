@@ -124,8 +124,8 @@ void printtime(const char desc[10], int rank, int size, long long timer)
 
 int main(int argc, char * argv[])
 {
-	unsigned char **matrix=malloc(sizeof(char)*MATSIZEX*MATSIZEY);
-	memset(matrix, 0, sizeof(char)*MATSIZEX*MATSIZEY)
+	unsigned char matrix[MATSIZEX][MATSIZEY];
+	memset(matrix, 0, sizeof(char)*MATSIZEX*MATSIZEY);
 	populate_matrix(matrix);
 	exit(0);
 	int rank, size, ii, jj;

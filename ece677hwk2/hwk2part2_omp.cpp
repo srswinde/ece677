@@ -1,6 +1,8 @@
 #include <iostream>
 #include <random>
 #include <memory.h>
+#include <omp.h>
+#include <sys/time.h>
 
 #define MATSIZEX 256
 #define MATSIZEY 256
@@ -34,7 +36,17 @@ void populate_matrix(unsigned char matrix[MATSIZEX][MATSIZEY])
 }
 
 
+long long getMicrotime()
+{
+        struct timeval currentTime;
+        gettimeofday(&currentTime, NULL);
+        return currentTime.tv_sec * (int)1e6 + currentTime.tv_usec;
+}
 
+void printtime(const char desc[10], int rank, int size, long long timer) 
+{ 
+        printf("omp> %s %i %i %f\n", desc, rank, size, (getMicrotime()-timer)/1e6); 
+}
 
 void print_matrix(unsigned char matrix[][256], int width, int height)
 {
@@ -49,7 +61,6 @@ void print_matrix(unsigned char matrix[][256], int width, int height)
 	
 
 }
-
 
 /*************************************************
  *
@@ -84,10 +95,14 @@ int main()
 	populate_matrix(start_matrix);
 
 	//Deep copy the matrix
-	memcpy(final_matrix, start_matrix, MATSIZEX*MATSIZEY*sizeof(unsigned char) );
+	//memcpy(final_matrix, start_matrix, MATSIZEX*MATSIZEY*sizeof(unsigned char) );
 	int filter_val;
-	print_matrix(start_matrix, 8,8);
-	#pragma omp parallel for
+
+	long long timer = getMicrotime();
+	#pragma omp parallel
+	{
+	printtime("init", omp_get_thread_num(), omp_get_num_threads(), timer );
+	#pragma omp for
 	for (int ii=0; ii<MATSIZEX-1; ++ii)
 	{
 		for(int jj=0; jj< MATSIZEY-1; ++jj)
@@ -103,13 +118,11 @@ int main()
 		
 			//printf("_________________________________________________\n");
 			//print_matrix(final_matrix, 8, 8);
-			exit(0);
 			
 		}
 	}
-
-	
-	
+	printtime("proc", omp_get_thread_num(), omp_get_num_threads(), timer);
+	}
 	
 }
 
