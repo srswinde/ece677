@@ -6,8 +6,8 @@
 #define MATSIZEY 256
 #define RANGE_HIGH 31
 #define RANGE_LOW 0
-#define WINDOWX 4
-#define WINDOWY 4
+#define WINDOWX 3
+#define WINDOWY 3
 
 
 /***********************************************
@@ -39,7 +39,10 @@ void print_matrix(unsigned char matrix[][256], int width, int height)
 	{
 		for(int jj=0; jj< height; ++jj)
 		{
-			printf("% 3d, ", matrix[ii][jj]);
+			if(jj!=height-1)
+				printf("% 3d, ", matrix[ii][jj]);
+			else
+				printf("% 3d ", matrix[ii][jj]);
 		}
 		printf("\n");
 	}
@@ -83,27 +86,20 @@ int main()
 	//Deep copy the matrix
 	memcpy(final_matrix, start_matrix, MATSIZEX*MATSIZEY*sizeof(unsigned char) );
 	int filter_val;
-	print_matrix(start_matrix, 8,8);
+	print_matrix(start_matrix, 128,128);
 	for (int ii=0; ii<MATSIZEX-1; ++ii)
 	{
 		for(int jj=0; jj< MATSIZEY-1; ++jj)
 		{
 			filter_val = filter_window(start_matrix, ii, jj);
-			for(int kk=1; kk<WINDOWX-1; kk++)
-			{
-				for(int ll=1; ll<WINDOWY-1; ll++)
-				{
-					final_matrix[ii+kk][jj+ll]=filter_val;
-				}
-			}
+			final_matrix[ii+1][jj+1]=filter_val;
 		
-			printf("_________________________________________________\n");
-			print_matrix(final_matrix, 8, 8);
-			exit(0);
 			
 		}
 	}
 
+	printf("_________________________________________________\n");
+	print_matrix(final_matrix, 128, 128);
 	
 	
 	

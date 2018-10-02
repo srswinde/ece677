@@ -28,14 +28,16 @@ void populate_matrix(unsigned char **matrix)
     std::mt19937 gen(rd());//mesenne twister engine
     std::uniform_int_distribution<unsigned char> dis(RANGE_LOW, RANGE_HIGH);
 	
-
-    for (int ii=0; ii<MATSIZEX; ++ii)
+	
+	for (int ii=0; ii<MATSIZEX; ++ii)
 	{
 		for(int jj=0; jj< MATSIZEY; ++jj)
 		{
 			matrix[ii][jj] = dis(gen);
+
 		}
 	}
+		
 }
 
 long getMicrotime()
@@ -119,6 +121,8 @@ void printtime(const char desc[10], int rank, int size, long long timer)
 { 
         printf("mpi> %s %i %i %f\n", desc, rank, size, (getMicrotime()-timer)/1e6); 
 }
+
+
 
 
 int main(int argc, char *argv[])
@@ -242,7 +246,6 @@ int main(int argc, char *argv[])
 			else
 			{
 				if(rank == 1)
-					printf("start y is %i\n", starty);
 				for(int ii=startx; ii<startx+WINDOWX; ii++)
 				{
 					for(int jj=starty; jj<starty+WINDOWY; jj++)
